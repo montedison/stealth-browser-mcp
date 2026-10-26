@@ -45,5 +45,33 @@ class SandboxRuleTests(unittest.TestCase):
             self.assertNotIn(flag, merged)
 
 
+class DisabledFeatureTests(unittest.TestCase):
+    def merged(self, system, args):
+        patches = environment(system, False, False)
+        with patches[0], patches[1], patches[2]:
+            return platform_utils.merge_browser_args(args)
+
+    def test_macos_turns_off_code_sign_clone(self):
+        merged = self.merged("Darwin", ["--lang=en-US"])
+        self.assertEqual(
+            merged,
+            ["--lang=en-US", "--disable-features=IsolateOrigins,site-per-process,MacAppCodeSignClone"],
+        )
+
+    def test_macos_folds_caller_features_into_one_switch(self):
+        merged = self.merged("Darwin", ["--disable-features=Translate, AutofillServerCommunication", "--lang=en-US"])
+        switches = [arg for arg in merged if arg.startswith("--disable-features=")]
+        self.assertEqual(
+            switches,
+            ["--disable-features=IsolateOrigins,site-per-process,Translate,AutofillServerCommunication,MacAppCodeSignClone"],
+        )
+        self.assertIn("--lang=en-US", merged)
+
+    def test_other_platforms_leave_features_alone(self):
+        for system in ("Windows", "Linux"):
+            args = ["--disable-features=Translate", "--lang=en-US"]
+            self.assertEqual(self.merged(system, args), args)
+
+
 if __name__ == "__main__":
     unittest.main()

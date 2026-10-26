@@ -8,6 +8,9 @@ import sys
 from typing import List, Optional
 
 BROWSER_EXECUTABLE_ENV = "STEALTH_BROWSER_EXECUTABLE"
+DISABLE_FEATURES_PREFIX = "--disable-features="
+NODRIVER_DISABLED_FEATURES = ("IsolateOrigins", "site-per-process")
+MACOS_DISABLED_FEATURES = ("MacAppCodeSignClone",)
 
 
 def is_running_as_root() -> bool:
@@ -97,26 +100,71 @@ def get_required_sandbox_args() -> List[str]:
     return ['--no-sandbox'] if sandbox_must_be_disabled() else []
 
 
+def get_required_disabled_features() -> List[str]:
+    """
+    Get Chrome features that must be turned off on the current platform.
+
+    On macOS, Chrome copies its whole app bundle into a code_sign_clone
+    directory at every launch and only deletes it on a clean exit, so crashed
+    or killed automation instances leave a copy behind each time. Turning off
+    MacAppCodeSignClone stops the copies, as Chrome for Testing already does.
+
+    Returns:
+        List[str]: Feature names to pass to --disable-features.
+    """
+    return list(MACOS_DISABLED_FEATURES) if platform.system() == "Darwin" else []
+
+
+def merge_disabled_features(args: List[str], features: List[str]) -> List[str]:
+    """
+    Fold every --disable-features value and the given features into one switch.
+
+    nodriver always passes its own --disable-features before ours, so the
+    merged switch repeats its defaults. The result is the same whether Chrome
+    keeps the last switch or combines them.
+
+    Args:
+        args (List[str]): Browser arguments.
+        features (List[str]): Feature names that must be disabled.
+
+    Returns:
+        List[str]: Arguments with a single combined --disable-features switch,
+        or the original arguments when there is nothing to add.
+    """
+    if not features:
+        return list(args)
+    names = list(NODRIVER_DISABLED_FEATURES)
+    remaining = []
+    for arg in args:
+        if arg.startswith(DISABLE_FEATURES_PREFIX):
+            names.extend(name.strip() for name in arg[len(DISABLE_FEATURES_PREFIX):].split(","))
+        else:
+            remaining.append(arg)
+    names.extend(features)
+    unique = [name for name in dict.fromkeys(names) if name]
+    return remaining + [DISABLE_FEATURES_PREFIX + ",".join(unique)]
+
+
 def merge_browser_args(user_args: Optional[List[str]] = None) -> List[str]:
     """
     Merge user-provided browser arguments with platform-specific required arguments.
-    
+
     Args:
         user_args: User-provided browser arguments
-        
+
     Returns:
         List[str]: Combined list of browser arguments
     """
     user_args = user_args or []
     required_args = get_required_sandbox_args()
-    
+
     combined_args = list(user_args)
-    
+
     for arg in required_args:
         if arg not in combined_args:
             combined_args.append(arg)
-    
-    return combined_args
+
+    return merge_disabled_features(combined_args, get_required_disabled_features())
 
 
 def get_platform_info() -> dict:
