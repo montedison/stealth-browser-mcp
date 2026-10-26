@@ -21,9 +21,9 @@ Navigate Cloudflare challenges, anti-bot checks, and login walls with real Chrom
 
 ## Sponsors
 
-<a href="https://go.nodemaven.com/stealthbrowsermcpreadmesept"><img src="https://raw.githubusercontent.com/vibheksoni/stealth-browser-mcp/master/media/nodemaven-sponsor.png" alt="NodeMaven" width="100%"></a>
+<a href="https://go.nodemaven.com/stealthbrowsermcpreadmeoct"><img src="https://raw.githubusercontent.com/vibheksoni/stealth-browser-mcp/master/media/nodemaven-sponsor.png" alt="NodeMaven" width="100%"></a>
 
-[NodeMaven](https://go.nodemaven.com/stealthbrowsermcpreadmesept) — The most efficient proxy provider for Web Scraping and Automation with the Highest Quality IP on the market.
+[NodeMaven](https://go.nodemaven.com/stealthbrowsermcpreadmeoct) — The most efficient proxy provider for Web Scraping and Automation with the Highest Quality IP on the market.
 
 **Why NodeMaven?**
 
@@ -38,7 +38,7 @@ Navigate Cloudflare challenges, anti-bot checks, and login walls with real Chrom
 - `STEALTHMCP35` — 35% off to Mobile and Residential Proxies
 - `STEALTHMCP40` — 40% off to ISP (Static) Proxies
 
-[Get started with NodeMaven](https://go.nodemaven.com/stealthbrowsermcpreadmesept)
+[Get started with NodeMaven](https://go.nodemaven.com/stealthbrowsermcpreadmeoct)
 
 > Sponsored placement. NodeMaven is a paid sponsor of this project.
 
