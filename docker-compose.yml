@@ -1,0 +1,16 @@
+services:
+  stealth-browser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealth_browser_mcp
+    restart: always
+    environment:
+      # Add this in Dokploy's Environment Variables UI
+      - STEALTH_BROWSER_MCP_AUTH_TOKEN=${STEALTH_TOKEN}
+    networks:
+      - unsloth-net
+
+networks:
+  unsloth-net:
+    external: true
